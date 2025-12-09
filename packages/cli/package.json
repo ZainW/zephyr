@@ -1,0 +1,24 @@
+{
+  "name": "@zephyr-ci/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "zephyr": "./src/bin.ts"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@zephyr-ci/core": "workspace:*",
+    "@zephyr-ci/types": "workspace:*",
+    "@zephyr-ci/config": "workspace:*"
+  }
+}
