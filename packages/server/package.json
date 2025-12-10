@@ -18,5 +18,13 @@
     "@zephyr-ci/types": "workspace:*",
     "@zephyr-ci/core": "workspace:*",
     "@zephyr-ci/storage": "workspace:*"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZainW/zephyr.git",
+    "directory": "packages/server"
+  },
+  "keywords": ["ci", "server", "api", "webhooks"],
+  "files": ["src"]
 }

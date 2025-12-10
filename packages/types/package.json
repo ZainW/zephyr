@@ -13,5 +13,13 @@
   "scripts": {
     "test": "bun test",
     "typecheck": "tsc --noEmit"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZainW/zephyr.git",
+    "directory": "packages/types"
+  },
+  "keywords": ["ci", "typescript", "types"],
+  "files": ["src"]
 }

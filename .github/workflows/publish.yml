@@ -1,0 +1,136 @@
+name: Publish Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.0)'
+        required: true
+        type: string
+      dry-run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Run tests
+        run: bun test
+
+      - name: Build
+        run: bun run build
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Extract version from tag (v1.0.0 -> 1.0.0)
+            echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update package versions
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+
+          # Update root package.json
+          bun -e "
+            const pkg = await Bun.file('package.json').json();
+            pkg.version = '$VERSION';
+            await Bun.write('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          # Update all workspace packages
+          for dir in packages/*; do
+            if [ -f "$dir/package.json" ]; then
+              bun -e "
+                const pkg = await Bun.file('$dir/package.json').json();
+                pkg.version = '$VERSION';
+                // Update workspace dependencies to use the same version
+                for (const depType of ['dependencies', 'devDependencies', 'peerDependencies']) {
+                  if (pkg[depType]) {
+                    for (const [name, version] of Object.entries(pkg[depType])) {
+                      if (version === 'workspace:*' && name.startsWith('@zephyr-ci/')) {
+                        pkg[depType][name] = '$VERSION';
+                      }
+                    }
+                  }
+                }
+                await Bun.write('$dir/package.json', JSON.stringify(pkg, null, 2) + '\n');
+              "
+            fi
+          done
+
+      - name: Publish packages
+        if: ${{ !inputs.dry-run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Publish packages in dependency order
+          PACKAGES=(
+            "packages/types"
+            "packages/config"
+            "packages/storage"
+            "packages/core"
+            "packages/vm"
+            "packages/server"
+            "packages/web"
+            "packages/cli"
+          )
+
+          for pkg in "${PACKAGES[@]}"; do
+            echo "Publishing $pkg..."
+            cd "$pkg"
+            npm publish --access public --provenance
+            cd ../..
+          done
+
+      - name: Dry run - show what would be published
+        if: ${{ inputs.dry-run }}
+        run: |
+          echo "Dry run - packages that would be published:"
+          for dir in packages/*; do
+            if [ -f "$dir/package.json" ]; then
+              name=$(bun -e "console.log((await Bun.file('$dir/package.json').json()).name)")
+              version=$(bun -e "console.log((await Bun.file('$dir/package.json').json()).version)")
+              echo "  $name@$version"
+            fi
+          done
+
+      - name: Create GitHub Release
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*

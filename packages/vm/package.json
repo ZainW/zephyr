@@ -16,5 +16,13 @@
   },
   "dependencies": {
     "@zephyr-ci/types": "workspace:*"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZainW/zephyr.git",
+    "directory": "packages/vm"
+  },
+  "keywords": ["ci", "vm", "firecracker", "microvm"],
+  "files": ["src"]
 }
