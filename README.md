@@ -15,8 +15,8 @@ A TypeScript-first CI runner built on Bun that uses Firecracker microVMs for sec
 ### Installation
 
 ```bash
-# Configure npm to use GitHub Packages for @zephyr-ci scope
-echo "@zephyr-ci:registry=https://npm.pkg.github.com" >> ~/.npmrc
+# Configure npm to use GitHub Packages for @zephyrr-ci scope
+echo "@zephyrr-ci:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
 # Install the CLI globally
 bun add -g @zephyrr-ci/cli
@@ -25,7 +25,7 @@ bun add -g @zephyrr-ci/cli
 bun add -D @zephyrr-ci/cli @zephyrr-ci/config
 ```
 
-For server deployment, see [docs/deployment.md](docs/deployment.md).
+For self-hosted server deployment, see [docs/self-hosting.md](docs/self-hosting.md).
 
 ### Initialize a Project
 
@@ -158,24 +158,28 @@ zephyr trigger           # Trigger a pipeline via API
 | `/api/v1/jobs/:id/logs` | GET | Get job logs |
 | `/ws` | WebSocket | Real-time log streaming |
 
-## VM Execution (Linux only)
+## Server Deployment
 
-For isolated VM execution, you need:
+Zephyr uses Firecracker microVMs for secure, isolated job execution. This requires:
 
-1. Linux with KVM support (`/dev/kvm`)
-2. Firecracker installed
-3. VM images built
+- Linux with KVM support (`/dev/kvm`)
+- Bare metal or VPS with nested virtualization (Hetzner, DigitalOcean Dedicated, AWS Bare Metal)
+- 4+ CPU cores, 8GB+ RAM
+
+**Quick setup:**
 
 ```bash
-# Build VM images (requires Docker and sudo)
-bun run build:images
+# Clone the repository
+git clone https://github.com/yourusername/zephyr.git
+cd zephyr
 
-# This creates:
-# - images/kernels/vmlinux (Linux kernel)
-# - images/rootfs/alpine-rootfs.ext4 (Alpine rootfs with agent)
+# Run the setup script (Arch or Ubuntu)
+./scripts/setup-ubuntu.sh
+# or
+./scripts/setup-arch.sh
 ```
 
-See [docs/deployment.md](docs/deployment.md) for full deployment instructions.
+See [docs/self-hosting.md](docs/self-hosting.md) for complete setup instructions including GitHub webhook configuration.
 
 ## Configuration Reference
 
@@ -197,8 +201,8 @@ bun run build
 ## Requirements
 
 - **Runtime**: [Bun](https://bun.sh) v1.0+
-- **VM Execution**: Linux with KVM, Firecracker v1.0+
-- **Local Execution**: Any OS (macOS, Linux, Windows via WSL)
+- **Server**: Linux with KVM support, Firecracker v1.0+
+- **Local Development**: `zephyr run` works on any OS for testing pipelines locally
 
 ## License
 

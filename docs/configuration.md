@@ -5,7 +5,7 @@ Zephyr uses TypeScript configuration files (`zephyr.config.ts`) for full type sa
 ## Basic Structure
 
 ```typescript
-import { defineConfig } from '@zephyr-ci/config';
+import { defineConfig } from '@zephyrr-ci/config';
 
 export default defineConfig({
   project: {
@@ -411,7 +411,7 @@ steps: [{
 ## Complete Example
 
 ```typescript
-import { defineConfig } from '@zephyr-ci/config';
+import { defineConfig } from '@zephyrr-ci/config';
 
 export default defineConfig({
   project: {
