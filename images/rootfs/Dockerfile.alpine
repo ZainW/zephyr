@@ -1,0 +1,61 @@
+# Alpine-based rootfs for Zephyr CI
+# This Dockerfile creates a minimal Alpine rootfs with the Zephyr agent
+
+FROM alpine:3.19 AS base
+
+# Install essential packages
+RUN apk add --no-cache \
+    openrc \
+    util-linux \
+    ca-certificates \
+    curl \
+    git \
+    bash \
+    openssh-client \
+    tar \
+    gzip \
+    xz \
+    # Build tools
+    build-base \
+    # For networking
+    iproute2 \
+    iptables \
+    # DNS resolution
+    bind-tools
+
+# Set up OpenRC for proper init
+RUN sed -i 's/^#rc_sys=""/rc_sys="lxc"/' /etc/rc.conf && \
+    echo 'rc_provide="loopback net"' >> /etc/rc.conf && \
+    sed -i 's/VSERVER/LXC/Ig' /lib/rc/sh/init.sh && \
+    sed -i 's/cgroup_add_service$/# cgroup_add_service/' /lib/rc/sh/openrc-run.sh && \
+    rm -f /etc/init.d/hwdrivers \
+          /etc/init.d/hwclock \
+          /etc/init.d/modules \
+          /etc/init.d/modules-load \
+          /etc/init.d/modloop
+
+# Create workspace directory
+RUN mkdir -p /workspace
+
+# Set up auto-login on serial console
+RUN echo "ttyS0::respawn:/sbin/getty -L ttyS0 115200 vt100" >> /etc/inittab
+
+# Set root password (for debugging)
+RUN echo "root:zephyr" | chpasswd
+
+# Configure networking to use DHCP by default
+RUN echo -e 'auto lo\niface lo inet loopback\n\nauto eth0\niface eth0 inet dhcp' > /etc/network/interfaces
+
+# Enable networking service
+RUN rc-update add networking default
+
+# Create agent service
+COPY agent-init.sh /etc/init.d/zephyr-agent
+RUN chmod +x /etc/init.d/zephyr-agent && \
+    rc-update add zephyr-agent default
+
+# Copy the pre-built agent binary (will be added during build)
+# COPY zephyr-agent /usr/local/bin/zephyr-agent
+
+# The rootfs will be extracted from this image
+CMD ["/sbin/init"]

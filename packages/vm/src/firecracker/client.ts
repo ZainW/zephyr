@@ -49,9 +49,9 @@ export class FirecrackerClient {
       method,
       headers: body ? { "Content-Type": "application/json" } : undefined,
       body: body ? JSON.stringify(body) : undefined,
-      // @ts-expect-error - Bun supports unix socket in fetch
+      // Bun supports unix socket in fetch
       unix: this.socketPath,
-    });
+    } as RequestInit);
 
     if (!response.ok) {
       const error = (await response.json()) as FirecrackerError;

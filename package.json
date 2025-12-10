@@ -3,11 +3,14 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "agent"
   ],
   "scripts": {
     "zephyr": "bun run packages/cli/src/bin.ts",
     "build": "bun run --filter '*' build",
+    "build:agent": "bun run images/build.ts --agent",
+    "build:images": "bun run images/build.ts --all",
     "test": "bun run --filter '*' test",
     "typecheck": "bun run --filter '*' typecheck"
   },

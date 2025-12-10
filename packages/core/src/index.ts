@@ -20,3 +20,32 @@ export {
   type Logger,
   type LogLevel,
 } from "./utils/logger.ts";
+
+// DAG Scheduler
+export {
+  buildDag,
+  validateDag,
+  getDagState,
+  markJobRunning,
+  markJobCompleted,
+  cancelAllJobs,
+  isDagComplete,
+  hasDagFailures,
+  getTopologicalOrder,
+  getParallelLayers,
+  type DagNode,
+  type DagJob,
+  type DagResult,
+} from "./scheduler/dag.ts";
+
+// Matrix Expansion
+export {
+  expandMatrix,
+  expandPipelineJobs,
+  interpolateMatrix,
+  applyMatrixToEnv,
+  getMatrixParallelism,
+  hasMatrix,
+  type MatrixCombination,
+  type ExpandedJob,
+} from "./matrix/expand.ts";

@@ -1,10 +1,7 @@
 {
-  "name": "@zephyr-ci/cli",
+  "name": "@zephyr-ci/server",
   "version": "0.1.0",
   "type": "module",
-  "bin": {
-    "zephyr": "./src/bin.ts"
-  },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
@@ -17,11 +14,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@zephyr-ci/core": "workspace:*",
     "@zephyr-ci/types": "workspace:*",
-    "@zephyr-ci/config": "workspace:*",
-    "@zephyr-ci/server": "workspace:*",
-    "@zephyr-ci/storage": "workspace:*",
-    "@zephyr-ci/web": "workspace:*"
+    "@zephyr-ci/core": "workspace:*",
+    "@zephyr-ci/storage": "workspace:*"
   }
 }

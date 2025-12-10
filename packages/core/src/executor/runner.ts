@@ -64,10 +64,8 @@ async function runCommand(
   const decoder = new TextDecoder();
 
   // Read stdout and stderr concurrently
-  const readStream = async (
-    reader: ReadableStreamDefaultReader<Uint8Array>,
-    isError: boolean
-  ) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const readStream = async (reader: any, isError: boolean) => {
     let buffer = "";
     while (true) {
       const { done, value } = await reader.read();
