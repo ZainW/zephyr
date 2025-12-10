@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@zephyrr-ci/types": "workspace:*"

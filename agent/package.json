@@ -8,6 +8,6 @@
   },
   "scripts": {
     "build": "bun build ./src/index.ts --compile --outfile=zephyr-agent",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit"
   }
 }
